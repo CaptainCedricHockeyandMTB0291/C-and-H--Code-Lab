@@ -1,0 +1,654 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Code Lab - Useful Tools</title>
+
+<style>
+:root {
+  --bg: #0d1420;
+  --panel: #172335;
+  --border: #304158;
+  --text: #edf3fc;
+  --muted: #a7b5c9;
+  --accent: #67a8ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 25px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  max-width: 1050px;
+  margin: auto;
+}
+
+header { margin-bottom: 25px; }
+
+h1 { font-size: 38px; }
+
+p { color: var(--muted); }
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+button {
+  background: #1b293b;
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 15px;
+  cursor: pointer;
+}
+
+button:hover,
+button.active {
+  background: #315d91;
+}
+
+.panel {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 22px;
+  margin-bottom: 15px;
+}
+
+.panel.show { display: block; }
+
+input:not([type=checkbox]),
+textarea {
+  width: 100%;
+  background: #101b2a;
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0 12px;
+  font: inherit;
+}
+
+textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.output {
+  background: #101b2a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.task {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.task span { flex: 1; }
+
+.completed {
+  text-decoration: line-through;
+  color: #8798ae;
+}
+
+.clock {
+  font-size: 48px;
+  margin: 20px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  margin-top: 30px;
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+
+<header>
+  <h1>Code Lab</h1>
+  <p>A collection of useful browser utilities and productivity tools.</p>
+</header>
+
+<nav>
+  <button class="active" data-tab="notes">Quick Notes</button>
+  <button data-tab="tasks">Task Manager</button>
+  <button data-tab="counter">Word Counter</button>
+  <button data-tab="json">JSON Toolkit</button>
+  <button data-tab="text">Text Toolkit</button>
+  <button data-tab="stopwatch">Stopwatch</button>
+</nav>
+
+<!-- QUICK NOTES -->
+<section class="panel show" id="notes">
+  <h2>Quick Notes</h2>
+
+  <input id="noteTitle" placeholder="Note title">
+
+  <textarea id="noteBody"
+    placeholder="Write your notes here..."></textarea>
+
+  <button id="saveNote">Save Note</button>
+  <button id="clearNote">Clear Editor</button>
+
+  <p id="noteStatus">Ready.</p>
+
+  <h3>Saved Note</h3>
+  <div class="output" id="savedNote">
+    No saved note.
+  </div>
+</section>
+
+<!-- TASK MANAGER -->
+<section class="panel" id="tasks">
+  <h2>Task Manager</h2>
+
+  <input id="taskInput"
+    placeholder="Enter a task...">
+
+  <button id="addTask">Add Task</button>
+
+  <p>Total: <span id="totalTasks">0</span></p>
+  <p>Completed: <span id="completedTasks">0</span></p>
+  <p>Remaining: <span id="remainingTasks">0</span></p>
+
+  <div id="taskList"></div>
+
+  <button id="clearCompleted">Clear Completed</button>
+  <button id="clearAllTasks">Clear All</button>
+</section>
+
+<!-- WORD COUNTER -->
+<section class="panel" id="counter">
+  <h2>Word Counter</h2>
+
+  <textarea id="counterInput"
+    placeholder="Enter text..."></textarea>
+
+  <p>Words: <strong id="wordCount">0</strong></p>
+  <p>Characters: <strong id="charCount">0</strong></p>
+  <p>Without spaces: <strong id="noSpaceCount">0</strong></p>
+  <p>Lines: <strong id="lineCount">0</strong></p>
+
+  <button id="clearCounter">Clear Text</button>
+</section>
+
+<!-- JSON TOOLKIT -->
+<section class="panel" id="json">
+  <h2>JSON Formatter and Validator</h2>
+
+  <textarea id="jsonInput"
+    placeholder='{"project":"Code Lab"}'></textarea>
+
+  <button id="prettyJson">Format JSON</button>
+  <button id="minifyJson">Minify JSON</button>
+  <button id="copyJson">Copy Result</button>
+
+  <div class="output" id="jsonOutput">
+    JSON output appears here.
+  </div>
+</section>
+
+<!-- TEXT TOOLKIT -->
+<section class="panel" id="text">
+  <h2>Text Toolkit</h2>
+
+  <textarea id="textInput"
+    placeholder="Enter text..."></textarea>
+
+  <button data-transform="upper">UPPERCASE</button>
+  <button data-transform="lower">lowercase</button>
+  <button data-transform="title">Title Case</button>
+  <button data-transform="trim">Clean Spaces</button>
+  <button data-transform="reverse">Reverse</button>
+
+  <div class="output" id="textOutput"></div>
+
+  <button id="copyText">Copy Result</button>
+  <button id="useResult">Use Result as Input</button>
+</section>
+
+<!-- STOPWATCH -->
+<section class="panel" id="stopwatch">
+  <h2>Stopwatch</h2>
+
+  <div class="clock" id="clock">00:00:00.0</div>
+
+  <button id="startWatch">Start</button>
+  <button id="pauseWatch">Pause</button>
+  <button id="resetWatch">Reset</button>
+
+  <p id="watchStatus">Ready.</p>
+</section>
+
+<footer>
+  Code Lab | Useful Tools and Original Projects
+</footer>
+
+</main>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+// NAVIGATION
+
+document.querySelectorAll("[data-tab]").forEach(button => {
+  button.addEventListener("click", () => {
+
+    document.querySelectorAll("[data-tab]")
+      .forEach(item => item.classList.toggle(
+        "active", item === button
+      ));
+
+    document.querySelectorAll(".panel")
+      .forEach(panel => panel.classList.toggle(
+        "show", panel.id === button.dataset.tab
+      ));
+  });
+});
+
+// QUICK NOTES
+
+const NOTE_KEY = "codeLab.note.v1";
+
+function loadNote() {
+  try {
+    const note = JSON.parse(
+      localStorage.getItem(NOTE_KEY) || "null"
+    );
+
+    if (!note) return;
+
+    $("noteTitle").value = note.title || "";
+    $("noteBody").value = note.body || "";
+
+    $("savedNote").textContent =
+      (note.title || "") + "\n\n" + (note.body || "");
+
+  } catch {
+    $("noteStatus").textContent =
+      "Could not load saved note.";
+  }
+}
+
+$("saveNote").addEventListener("click", () => {
+
+  const note = {
+    title: $("noteTitle").value,
+    body: $("noteBody").value
+  };
+
+  try {
+    localStorage.setItem(
+      NOTE_KEY, JSON.stringify(note)
+    );
+
+    $("savedNote").textContent =
+      note.title + "\n\n" + note.body;
+
+    $("noteStatus").textContent = "Note saved.";
+
+  } catch {
+    $("noteStatus").textContent =
+      "Browser storage unavailable.";
+  }
+});
+
+$("clearNote").addEventListener("click", () => {
+  $("noteTitle").value = "";
+  $("noteBody").value = "";
+  $("noteStatus").textContent = "Editor cleared.";
+});
+
+loadNote();
+
+// TASK MANAGER
+
+const TASK_KEY = "codeLab.tasks.v1";
+
+let tasks = [];
+
+try {
+  const stored = JSON.parse(
+    localStorage.getItem(TASK_KEY) || "[]"
+  );
+
+  if (Array.isArray(stored)) tasks = stored;
+
+} catch {
+  tasks = [];
+}
+
+function saveTasks() {
+  try {
+    localStorage.setItem(
+      TASK_KEY, JSON.stringify(tasks)
+    );
+  } catch {
+    alert("Could not save tasks.");
+  }
+}
+
+function renderTasks() {
+
+  const list = $("taskList");
+  list.replaceChildren();
+
+  tasks.forEach((task, index) => {
+
+    const row = document.createElement("div");
+    row.className = "task";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.done;
+
+    checkbox.addEventListener("change", () => {
+      tasks[index].done = checkbox.checked;
+      saveTasks();
+      renderTasks();
+    });
+
+    const label = document.createElement("span");
+    label.textContent = task.text;
+
+    if (task.done) {
+      label.classList.add("completed");
+    }
+
+    const remove = document.createElement("button");
+    remove.textContent = "Delete";
+
+    remove.addEventListener("click", () => {
+      tasks.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    });
+
+    row.append(checkbox, label, remove);
+    list.append(row);
+  });
+
+  const completed = tasks.filter(t => t.done).length;
+
+  $("totalTasks").textContent = tasks.length;
+  $("completedTasks").textContent = completed;
+  $("remainingTasks").textContent =
+    tasks.length - completed;
+}
+
+function addTask() {
+
+  const value = $("taskInput").value.trim();
+
+  if (!value) return;
+
+  tasks.push({
+    text: value,
+    done: false
+  });
+
+  $("taskInput").value = "";
+
+  saveTasks();
+  renderTasks();
+}
+
+$("addTask").addEventListener("click", addTask);
+
+$("taskInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") addTask();
+});
+
+$("clearCompleted").addEventListener("click", () => {
+  tasks = tasks.filter(task => !task.done);
+  saveTasks();
+  renderTasks();
+});
+
+$("clearAllTasks").addEventListener("click", () => {
+
+  if (!tasks.length) return;
+
+  if (!confirm("Delete all tasks?")) return;
+
+  tasks = [];
+  saveTasks();
+  renderTasks();
+});
+
+renderTasks();
+
+// WORD COUNTER
+
+function updateWordCount() {
+
+  const value = $("counterInput").value;
+  const trimmed = value.trim();
+
+  const words = trimmed
+    ? trimmed.split(/\s+/u).length
+    : 0;
+
+  $("wordCount").textContent = words;
+  $("charCount").textContent = value.length;
+
+  $("noSpaceCount").textContent =
+    [...value].filter(char => !/\s/u.test(char)).length;
+
+  $("lineCount").textContent =
+    value.length ? value.split(/\r\n|\r|\n/).length : 0;
+}
+
+$("counterInput").addEventListener(
+  "input", updateWordCount
+);
+
+$("clearCounter").addEventListener("click", () => {
+  $("counterInput").value = "";
+  updateWordCount();
+});
+
+// JSON TOOLKIT
+
+let jsonResult = "";
+
+function processJSON(compact) {
+
+  try {
+
+    const parsed = JSON.parse(
+      $("jsonInput").value
+    );
+
+    jsonResult = JSON.stringify(
+      parsed, null, compact ? 0 : 2
+    );
+
+    $("jsonOutput").textContent = jsonResult;
+
+  } catch (error) {
+
+    jsonResult = "";
+
+    $("jsonOutput").textContent =
+      "Invalid JSON: " + error.message;
+  }
+}
+
+$("prettyJson").addEventListener(
+  "click", () => processJSON(false)
+);
+
+$("minifyJson").addEventListener(
+  "click", () => processJSON(true)
+);
+
+$("copyJson").addEventListener("click", async () => {
+
+  if (!jsonResult) return;
+
+  try {
+    await navigator.clipboard.writeText(jsonResult);
+    $("jsonOutput").textContent += "\n\nCopied.";
+
+  } catch {
+    $("jsonOutput").textContent +=
+      "\n\nClipboard unavailable.";
+  }
+});
+
+// TEXT TOOLKIT
+
+let transformedText = "";
+
+document.querySelectorAll("[data-transform]")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const value = $("textInput").value;
+
+      switch (button.dataset.transform) {
+
+        case "upper":
+          transformedText = value.toUpperCase();
+          break;
+
+        case "lower":
+          transformedText = value.toLowerCase();
+          break;
+
+        case "title":
+          transformedText = value.toLowerCase()
+            .replace(/(^|[\s-])\p{L}/gu,
+              match => match.toUpperCase());
+          break;
+
+        case "trim":
+          transformedText = value.trim()
+            .replace(/\s+/gu, " ");
+          break;
+
+        case "reverse":
+          transformedText = [...value].reverse().join("");
+          break;
+      }
+
+      $("textOutput").textContent = transformedText;
+    });
+  });
+
+$("copyText").addEventListener("click", async () => {
+
+  if (!transformedText) return;
+
+  try {
+    await navigator.clipboard.writeText(transformedText);
+  } catch {
+    alert("Clipboard access unavailable.");
+  }
+});
+
+$("useResult").addEventListener("click", () => {
+  $("textInput").value = transformedText;
+});
+
+// STOPWATCH
+
+let elapsed = 0;
+let startedAt = null;
+let animationFrame = null;
+
+function formatTime(ms) {
+
+  const tenths = Math.floor(ms / 100) % 10;
+  const seconds = Math.floor(ms / 1000) % 60;
+  const minutes = Math.floor(ms / 60000) % 60;
+  const hours = Math.floor(ms / 3600000);
+
+  return [
+    hours, minutes, seconds
+  ].map(value => String(value).padStart(2, "0"))
+   .join(":") + "." + tenths;
+}
+
+function drawClock() {
+
+  const current = elapsed +
+    (startedAt === null
+      ? 0
+      : performance.now() - startedAt);
+
+  $("clock").textContent = formatTime(current);
+
+  if (startedAt !== null) {
+    animationFrame = requestAnimationFrame(drawClock);
+  }
+}
+
+$("startWatch").addEventListener("click", () => {
+
+  if (startedAt !== null) return;
+
+  startedAt = performance.now();
+
+  $("watchStatus").textContent = "Running.";
+
+  drawClock();
+});
+
+$("pauseWatch").addEventListener("click", () => {
+
+  if (startedAt === null) return;
+
+  elapsed += performance.now() - startedAt;
+  startedAt = null;
+
+  cancelAnimationFrame(animationFrame);
+
+  drawClock();
+
+  $("watchStatus").textContent = "Paused.";
+});
+
+$("resetWatch").addEventListener("click", () => {
+
+  elapsed = 0;
+  startedAt = null;
+
+  cancelAnimationFrame(animationFrame);
+
+  drawClock();
+
+  $("watchStatus").textContent = "Reset.";
+});
+
+</script>
+</body>
+</html>
